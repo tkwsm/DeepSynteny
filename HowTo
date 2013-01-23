@@ -1,0 +1,15 @@
+
+plot( t1[, 3], t1[, 4])
+
+for(i in 1:246){ abline(v=t1_x[i, 4]) }
+
+data <- read.table("cluster2.txt", header=TRUE, row.names=1 )
+d <- dist( data, method="canberra" )
+d.hc <- hclust( d )
+#plot(d.hc, main="centroid", hang=-1)
+plot(d.hc, method="complete" )
+cutcol <- cutree(d.hc, k=4)
+or
+cutcol <- cutree(d.hc, h=6)
+write.table(cutcol, file="x.list", col.names=TRUE)
+
