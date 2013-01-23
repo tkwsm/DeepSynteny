@@ -2,7 +2,7 @@
 require 'rubygems'
 require 'bio'
 
-module MutualBestDat
+module DeepSynteny
 
   class MutualPair
 
@@ -205,8 +205,8 @@ module MutualBestDat
       @spe2scaf_obj  = species2scaffolds_obj
       @spe1genes_obj = species1genes_obj
       @spe2genes_obj = species2genes_obj
-      @spe1_gene_coordinate = MutualBestDat::get_genes_coordinate( species1, @spe1scaf_obj, @spe1genes_obj )
-      @spe2_gene_coordinate = MutualBestDat::get_genes_coordinate( species2, @spe2scaf_obj, @spe2genes_obj )
+      @spe1_gene_coordinate = DeepSynteny::get_genes_coordinate( species1, @spe1scaf_obj, @spe1genes_obj )
+      @spe2_gene_coordinate = DeepSynteny::get_genes_coordinate( species2, @spe2scaf_obj, @spe2genes_obj )
       @spe1gene2mutualbestids = {}
       @spe2gene2mutualbestids = {}
     end
@@ -252,18 +252,18 @@ module MutualBestDat
       if    species == @species1
         @spe1scaf_obj.sort_by_hint!( hint_hash )
       elsif species == @species2
-        @spe1scaf_obj.sort_by_hint!( hint_hash )
+        @spe2scaf_obj.sort_by_hint!( hint_hash )
       else
         STDER.print "species should be #{@species1} or #{@species2}\n"
         exit
       end
-      @spe1_gene_coordinate = MutualBestDat::get_genes_coordinate( @species1, @spe1scaf_obj, @spe1genes_obj )
-      @spe2_gene_coordinate = MutualBestDat::get_genes_coordinate( @species2, @spe2scaf_obj, @spe2genes_obj )
+      @spe1_gene_coordinate = DeepSynteny::get_genes_coordinate( @species1, @spe1scaf_obj, @spe1genes_obj )
+      @spe2_gene_coordinate = DeepSynteny::get_genes_coordinate( @species2, @spe2scaf_obj, @spe2genes_obj )
     end
 
     def recreate_gene_coodinate!
-      @spe1_gene_coordinate = MutualBestDat::get_genes_coordinate( @species1, @spe1scaf_obj, @spe1genes_obj )
-      @spe2_gene_coordinate = MutualBestDat::get_genes_coordinate( @species2, @spe2scaf_obj, @spe2genes_obj )
+      @spe1_gene_coordinate = DeepSynteny::get_genes_coordinate( @species1, @spe1scaf_obj, @spe1genes_obj )
+      @spe2_gene_coordinate = DeepSynteny::get_genes_coordinate( @species2, @spe2scaf_obj, @spe2genes_obj )
     end
 
     def each_key
@@ -286,7 +286,7 @@ module MutualBestDat
 
   end
 
-  def MutualBestDat::get_scaffolds_object( sca_fasta, species_id, min_scaf )
+  def DeepSynteny::get_scaffolds_object( sca_fasta, species_id, min_scaf )
     minimum_length_for_scaffold = min_scaf
     scaffolds_object = ScaffoldsDat.new( species_id )
     scaff = Bio::FlatFile.new(Bio::FastaFormat, sca_fasta )
@@ -299,7 +299,7 @@ module MutualBestDat
     return scaffolds_object
   end
 
-  def MutualBestDat::get_genes_object( gff, species_id, scaffolds_object )
+  def DeepSynteny::get_genes_object( gff, species_id, scaffolds_object )
 
     genesdat     = GenesDat.new( species_id )
 
@@ -329,7 +329,7 @@ module MutualBestDat
     return genesdat
   end
 
-  def MutualBestDat::get_genes_coordinate( species_id, scaffolds_obj, genes_obj  )
+  def DeepSynteny::get_genes_coordinate( species_id, scaffolds_obj, genes_obj  )
 
     current_x_axis_base = 0
     scaffolds_obj.sort_gene_by_location!( genes_obj )
@@ -345,7 +345,7 @@ module MutualBestDat
     end
   end
 
-  def MutualBestDat::get_cutree_file( cutree_output )
+  def DeepSynteny::get_cutree_file( cutree_output )
     output_h = {}
     a = []
     scafid = ""
@@ -363,7 +363,7 @@ module MutualBestDat
     return output_h
   end
 
-  def MutualBestDat::get_scaffold_cluster( scaffold_order_file )
+  def DeepSynteny::get_scaffold_cluster( scaffold_order_file )
     a = []
     s = ""
     c = ""
@@ -380,7 +380,7 @@ module MutualBestDat
     return h
   end
 
-  def MutualBestDat::easy_pipeline_1( species1_name, 
+  def DeepSynteny::easy_pipeline_1( species1_name, 
                                       species2_name,
                                       spe1scaffolds_file, 
                                       spe2scaffolds_file, 
@@ -390,11 +390,11 @@ module MutualBestDat
 
     min_scaf_for_species1 = 20000
     min_scaf_for_species2 = 20000
-    spe1scaf_obj = MutualBestDat::get_scaffolds_object( spe1scaffolds_file, species1_name, min_scaf_for_species1 )
-    spe2scaf_obj = MutualBestDat::get_scaffolds_object( spe1scaffolds_file, species1_name, min_scaf_for_species2 )
-    spe1genes_obj = MutualBestDat::get_genes_object( species1gff_file, species1_name, spe1scaf_obj )
-    spe2genes_obj = MutualBestDat::get_genes_object( species2gff_file, species2_name, spe2scaf_obj )
-    mutualbests = MutualBestDat::MutualBestPoint.new( species1_name, species2_name, spe1scaf_obj, spe2scaf_obj, spe1genes_obj, spe2genes_obj )
+    spe1scaf_obj = DeepSynteny::get_scaffolds_object( spe1scaffolds_file, species1_name, min_scaf_for_species1 )
+    spe2scaf_obj = DeepSynteny::get_scaffolds_object( spe2scaffolds_file, species2_name, min_scaf_for_species2 )
+    spe1genes_obj = DeepSynteny::get_genes_object( species1gff_file, species1_name, spe1scaf_obj )
+    spe2genes_obj = DeepSynteny::get_genes_object( species2gff_file, species2_name, spe2scaf_obj )
+    mutualbests = DeepSynteny::MutualBestPoint.new( species1_name, species2_name, spe1scaf_obj, spe2scaf_obj, spe1genes_obj, spe2genes_obj )
     mutualbests.get_mutual_bests_from_file( mutual_best_list_file )
     mutualbests.spe1scaf_obj.recreate_scaffolds!
     mutualbests.spe2scaf_obj.recreate_scaffolds!
@@ -410,7 +410,7 @@ module MutualBestDat
  
   end
 
-  def MutualBestDat::easy_pipeline_2( species1_name, 
+  def DeepSynteny::easy_pipeline_2( species1_name, 
                                       species2_name,
                                       spe1scaffolds_file, 
                                       spe2scaffolds_file, 
@@ -420,7 +420,7 @@ module MutualBestDat
                                       spe1hint_file,
                                       spe2hint_file )
 
-    mutualbests = MutualBestDat::easy_pipeline_1( species1_name, 
+    mutualbests = DeepSynteny::easy_pipeline_1( species1_name, 
                                       species2_name,
                                       spe1scaffolds_file, 
                                       spe2scaffolds_file, 
@@ -437,7 +437,6 @@ module MutualBestDat
     return mutualbests
  
   end
-
 
 end
 
